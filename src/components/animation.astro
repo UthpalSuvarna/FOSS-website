@@ -1,102 +1,101 @@
 <div id="binary-field" class="absolute inset-0">
-    <canvas id="binary-field-canvas"></canvas>
-  </div>
- <style>
-    #binary-field {
-  background-color: black;
-  overflow: hidden;
-}
-
-#binary-field-canvas {
-  width: 100%;
-  height: 100%;
-}
-    </style>  
-    <script>
-        import invariant from "tiny-invariant";
-
-const ROW_HEIGHT = 10;
-const COLUMN_WIDTH = 10;
-const COUNT = 500;
-const SPEED = 0.2;
-
-class Bit {
-  x: number;
-  y: number;
-  z: number;
-  value: number;
-
-  constructor(x = 0, y = 0, z = 0) {
-    this.x = x;
-    this.y = y;
-    this.z = z;
-    this.value = Math.random() < 0.5 ? 0 : 1;
+  <canvas id="binary-field-canvas"></canvas>
+</div>
+<style>
+  #binary-field {
+    background-color: black;
+    overflow: hidden;
   }
 
-  update(width: number, height: number, speed: number) {
-    this.z += speed * 0.0675;
-    if (this.z > 1) {
-      this.z = 0;
+  #binary-field-canvas {
+    width: 100%;
+    height: 100%;
+  }
+</style>
+<script>
+  import invariant from "tiny-invariant";
+
+  const ROW_HEIGHT = 10;
+  const COLUMN_WIDTH = 10;
+  const COUNT = 500;
+  const SPEED = 0.2;
+
+  class Bit {
+    x: number;
+    y: number;
+    z: number;
+    value: number;
+
+    constructor(x = 0, y = 0, z = 0) {
+      this.x = x;
+      this.y = y;
+      this.z = z;
       this.value = Math.random() < 0.5 ? 0 : 1;
+    }
+
+    update(width: number, height: number, speed: number) {
+      this.z += speed * 0.0675;
+      if (this.z > 1) {
+        this.z = 0;
+        this.value = Math.random() < 0.5 ? 0 : 1;
+      }
+    }
+
+    draw(ctx: CanvasRenderingContext2D) {
+      ctx.fillStyle = `rgba(255, 255, 255, ${this.z})`;
+      ctx.font = `${ROW_HEIGHT}px monospace`;
+      ctx.fillText(this.value.toString(), this.x, this.y);
     }
   }
 
-  draw(ctx: CanvasRenderingContext2D) {
-    ctx.fillStyle = `rgba(255, 255, 255, ${this.z})`;
-    ctx.font = `${ROW_HEIGHT}px monospace`;
-    ctx.fillText(this.value.toString(), this.x, this.y);
-  }
-}
+  const bits = Array.from({ length: COUNT }, () => new Bit(0, 0, 0));
+  let rafId = 0;
 
-const bits = Array.from({ length: COUNT }, () => new Bit(0, 0, 0));
-let rafId = 0;
+  const canvas = document.querySelector(
+    "#binary-field-canvas"
+  ) as HTMLCanvasElement;
+  invariant(canvas, "canvas should not be null");
+  const ctx = canvas.getContext("2d");
 
-const canvas = document.querySelector(
-  "#binary-field-canvas"
-) as HTMLCanvasElement;
-invariant(canvas, "canvas should not be null");
-const ctx = canvas.getContext("2d");
+  const container = document.querySelector("#binary-field") as HTMLElement;
+  invariant(container, "container should not be null");
+  const resizeObserver = new ResizeObserver(setup);
+  resizeObserver.observe(container);
 
-const container = document.querySelector("#binary-field") as HTMLElement;
-invariant(container, "container should not be null");
-const resizeObserver = new ResizeObserver(setup);
-resizeObserver.observe(container);
+  function setup() {
+    invariant(ctx, "canvas context should not be null");
+    rafId > 0 && cancelAnimationFrame(rafId);
 
-function setup() {
-  invariant(ctx, "canvas context should not be null");
-  rafId > 0 && cancelAnimationFrame(rafId);
+    const { clientWidth: width, clientHeight: height } = container;
+    const dpr = window.devicePixelRatio || 1;
+    canvas.width = width * dpr;
+    canvas.height = height * dpr;
+    canvas.style.width = `${width}px`;
+    canvas.style.height = `${height}px`;
+    ctx.scale(dpr, dpr);
 
-  const { clientWidth: width, clientHeight: height } = container;
-  const dpr = window.devicePixelRatio || 1;
-  canvas.width = width * dpr;
-  canvas.height = height * dpr;
-  canvas.style.width = `${width}px`;
-  canvas.style.height = `${height}px`;
-  ctx.scale(dpr, dpr);
+    for (const bit of bits) {
+      bit.x = Math.random() * width;
+      bit.y = Math.random() * height;
+      bit.z = Math.random();
+    }
 
-  for (const bit of bits) {
-    bit.x = Math.random() * width;
-    bit.y = Math.random() * height;
-    bit.z = Math.random();
-  }
-
-  ctx.fillStyle = "rgba(0, 0, 0, 0.4)";
-  ctx.textAlign = "center";
-  ctx.textBaseline = "middle";
-  rafId = requestAnimationFrame(frame);
-}
-
-function frame() {
-  invariant(ctx, "canvas context should not be null");
-  const { clientWidth: width, clientHeight: height } = container;
-
-  ctx.clearRect(0, 0, width, height);
-  for (const bit of bits) {
-    bit.update(width, height, SPEED);
-    bit.draw(ctx);
+    ctx.fillStyle = "rgba(0, 0, 0, 0.4)";
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    rafId = requestAnimationFrame(frame);
   }
 
-  rafId = requestAnimationFrame(frame);
-}
+  function frame() {
+    invariant(ctx, "canvas context should not be null");
+    const { clientWidth: width, clientHeight: height } = container;
 
-    </script>
+    ctx.clearRect(0, 0, width, height);
+    for (const bit of bits) {
+      bit.update(width, height, SPEED);
+      bit.draw(ctx);
+    }
+
+    rafId = requestAnimationFrame(frame);
+  }
+</script>

@@ -7,31 +7,26 @@ const features: Array<Advantages> = [
     title: "Cost",
     description:
       " FOSS is typically free to download, use, and distribute, which can help individuals and organizations save money on software licensing fees.",
-  
   },
   {
     title: "Flexibility",
     description:
       "Users are free to modify and customize FOSS to suit their specific needs, allowing for greater flexibility than proprietary software.",
-
   },
   {
     title: "Security",
     description:
       "FOSS is often considered more secure than proprietary software because the code is open for review and can be audited by security experts.",
-
   },
   {
     title: "Community",
     description:
       "FOSS has a large and active community of developers, users, and contributors who work together to improve the software and provide support to users.",
-
   },
   {
     title: "Transperency",
     description:
       "FOSS is developed in an open and transparent manner, which can help build trust and accountability among users and contributors.",
-
   },
   {
     title: "Innovation",
@@ -42,12 +37,10 @@ const features: Array<Advantages> = [
 ---
 
 <ContentSection title="Advantages" id="advantages">
-  <Fragment slot="lead">
-    
-  </Fragment>
+  <Fragment slot="lead"></Fragment>
   <ul class="grid max-w-6xl grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
     {
-      features.map(({ title, description, }) => (
+      features.map(({ title, description }) => (
         <li class="flex flex-col items-center gap-4 border border-default bg-offset p-6">
           <p class="text-center font-extrabold text-xl">{title}</p>
           <p class="text-center text-offset text-sm">{description}</p>
